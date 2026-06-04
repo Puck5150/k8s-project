@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-interview-demo-config
+data:
+  APP_ENV: "local-kubernetes"
+  APP_MESSAGE: "Hello from ConfigMap"
