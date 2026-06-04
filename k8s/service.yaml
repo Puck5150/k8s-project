@@ -2,11 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: k8s-interview-demo
+  labels:
+    app: k8s-interview-demo
 spec:
   selector:
     app: k8s-interview-demo
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 5000
   type: ClusterIP
