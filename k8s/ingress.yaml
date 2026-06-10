@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: k8s-project
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: k8s-project.local
       http:
