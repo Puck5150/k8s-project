@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: k8s-project:v4
-          imagePullPolicy: Never
+          image: ghcr.io/puck5150/k8s-project:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           resources:
