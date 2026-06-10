@@ -1,17 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: k8s-interview-demo
+  name: k8s-project
 spec:
   ingressClassName: nginx
   rules:
-    - host: k8s-demo.local
+    - host: k8s-project.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: k8s-interview-demo
+                name: k8s-project
                 port:
                   number: 80

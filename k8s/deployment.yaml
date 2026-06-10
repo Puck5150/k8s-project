@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-interview-demo
+  name: k8s-project
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: k8s-interview-demo
+      app: k8s-project
   template:
     metadata:
       labels:
-        app: k8s-interview-demo
+        app: k8s-project
     spec:
       containers:
         - name: app
-          image: k8s-interview-demo:v4
+          image: k8s-project:v4
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
@@ -27,12 +27,12 @@ spec:
               memory: "256Mi"
           envFrom:
             - configMapRef:
-                name: k8s-interview-demo-config
+                name: k8s-project-config
           env:
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: k8s-interview-demo-secret
+                  name: k8s-project-secret
                   key: API_KEY
           readinessProbe:
             httpGet:
