@@ -1,471 +1,237 @@
-# Kubernetes Interview Demo
+# k8s-project
+
+A Kubernetes-based platform project demonstrating modern DevOps practices including containerization, CI/CD, Kubernetes deployment, observability, and automated scaling.
 
 ## Overview
 
-This project demonstrates the deployment, operation, scaling, and monitoring of a containerized Python Flask application running on Kubernetes.
+This project began as a Kubernetes learning exercise and evolved into a reusable platform foundation for future projects.
 
-The goal of the project is to build practical experience with modern DevOps and cloud-native tooling while implementing concepts commonly used in production environments.
+Current capabilities include:
 
-The application is deployed to a local Kubernetes cluster and includes:
+- Flask application deployment
+- Docker containerization
+- GitHub Actions CI pipeline
+- GitHub Container Registry (GHCR)
+- K3s Kubernetes cluster
+- Traefik ingress
+- ConfigMaps and Secrets
+- Horizontal Pod Autoscaling (HPA)
+- Prometheus metrics collection
+- Grafana dashboards and visualization
 
-* Containerization with Docker
-* Kubernetes Deployments and Services
-* ConfigMap and Secret management
-* Health probes
-* Horizontal Pod Autoscaling (HPA)
-* Ingress routing
-* Prometheus monitoring
-* Grafana dashboards
-* Application metrics instrumentation
-* ServiceMonitor-based metrics discovery
-
----
-
-# Architecture
+## Architecture
 
 ```text
-                        ┌─────────────────┐
-                        │     Grafana     │
-                        └────────┬────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │   Prometheus    │
-                        └────────┬────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │ ServiceMonitor  │
-                        └────────┬────────┘
-                                 │
-                                 ▼
-
-User
- │
- ▼
-Ingress
- │
- ▼
-Service
- │
- ▼
-Deployment
- │
- ▼
-Pods
- │
- ▼
-Flask Application
+GitHub
+   │
+   ▼
+GitHub Actions
+   │
+   ▼
+GitHub Container Registry (GHCR)
+   │
+   ▼
+K3s Cluster
+   │
+   ├── Traefik Ingress
+   ├── Deployment
+   ├── Service
+   ├── ConfigMap
+   ├── Secret
+   ├── HPA
+   └── ServiceMonitor
+           │
+           ▼
+      Prometheus
+           │
+           ▼
+        Grafana
 ```
 
-Supporting Kubernetes Resources:
-
-* ConfigMap
-* Secret
-* Horizontal Pod Autoscaler
-* ServiceMonitor
-
----
-
-# Technologies Used
-
-## Application
-
-* Python
-* Flask
-
-## Containerization
-
-* Docker
-
-## Kubernetes
-
-* Deployment
-* Service
-* ConfigMap
-* Secret
-* Ingress
-* Horizontal Pod Autoscaler
-* ServiceMonitor
-
-## Monitoring
-
-* Prometheus
-* Grafana
-* kube-prometheus-stack
-* Metrics Server
-
-## Tooling
-
-* Helm
-* Git
-* GitHub
-* kubectl
-
----
-
-# Features
-
-## Flask Application
-
-A lightweight Flask application provides:
-
-### Endpoints
-
-| Endpoint | Purpose                 |
-| -------- | ----------------------- |
-| /        | Application information |
-| /health  | Health check            |
-| /metrics | Prometheus metrics      |
-
-The application returns:
-
-* Environment information
-* Pod hostname
-* ConfigMap values
-* Secret validation status
-
-Example:
-
-```json
-{
-  "message": "Hello from ConfigMap",
-  "environment": "local-kubernetes",
-  "hostname": "k8s-interview-demo-xxxxx",
-  "api_key_loaded": true
-}
-```
-
----
-
-## Docker
-
-The application is containerized using Docker.
-
-The image includes:
-
-* Python runtime
-* Flask application
-* Prometheus client library
-
----
-
-## Kubernetes Deployment
-
-The application is deployed using a Kubernetes Deployment.
-
-Features:
-
-* Multiple replicas
-* Rolling updates
-* Self-healing pods
-* Declarative desired state
-
----
-
-## Kubernetes Service
-
-A ClusterIP Service provides:
-
-* Stable networking
-* Internal load balancing
-* Service discovery
-
----
-
-## ConfigMap
-
-Application configuration is externalized using a ConfigMap.
-
-Examples:
-
-* APP_ENV
-* APP_MESSAGE
-
-Benefits:
-
-* Configuration separated from code
-* Reusable container images
-* Environment-specific configuration
-
----
-
-## Secret Management
-
-Sensitive values are stored in Kubernetes Secrets.
-
-Example:
-
-* API_KEY
-
-The application verifies the secret exists without exposing the value.
-
----
-
-## Health Probes
-
-### Readiness Probe
-
-Determines when a pod is ready to receive traffic.
-
-### Liveness Probe
-
-Determines when Kubernetes should restart a pod.
-
-Benefits:
-
-* Improved availability
-* Automatic recovery
-
----
-
-## Resource Requests and Limits
-
-CPU and memory requests/limits are configured.
-
-Benefits:
-
-* Predictable scheduling
-* Resource isolation
-* Reduced noisy-neighbor issues
-
----
-
-## Horizontal Pod Autoscaler
-
-The deployment automatically scales based on CPU utilization.
-
-Configuration:
-
-* Minimum Replicas: 2
-* Maximum Replicas: 5
-* Target CPU Utilization: 50%
-
-Testing confirmed automatic scaling from:
+## Project Structure
 
 ```text
-2 Pods
-  ↓
-5 Pods
+k8s-project/
+├── .github/
+│   └── workflows/
+│       └── docker-build.yml
+├── app/
+│   ├── main.py
+│   └── requirements.txt
+├── k8s/
+│   ├── configmap.yaml
+│   ├── deployment.yaml
+│   ├── hpa.yaml
+│   ├── ingress.yaml
+│   ├── service.yaml
+│   ├── secrets.yaml
+│   ├── servicemonitor.yaml
+│   ├── grafana-ingress.yaml
+│   └── prometheus-ingress.yaml
+├── Dockerfile
+├── Makefile
+├── .gitignore
+└── README.md
 ```
 
-under generated load.
+## Features
 
----
+### CI/CD
 
-## Ingress
+GitHub Actions automatically:
 
-NGINX Ingress routes traffic into the cluster.
+- Builds container images
+- Pushes images to GitHub Container Registry
+- Maintains `latest` and commit-specific image tags
 
-Example:
+Example image:
 
 ```text
-http://k8s-demo.local
+ghcr.io/<github-username>/k8s-project:latest
 ```
 
-Traffic Flow:
+### Kubernetes Deployment
 
-```text
-Ingress Controller
-      ↓
-Ingress Rule
-      ↓
-Service
-      ↓
-Pods
-```
+The application is deployed to a K3s cluster using:
 
----
+- Deployment
+- Service
+- Ingress
+- ConfigMap
+- Secret
+- Horizontal Pod Autoscaler
 
-# Monitoring and Observability
+### Observability
 
-## Prometheus
-
-Prometheus is deployed using the kube-prometheus-stack Helm chart.
-
-Collected Metrics:
-
-* Node metrics
-* Kubernetes metrics
-* Deployment metrics
-* Pod metrics
-* Application metrics
-
----
-
-## Grafana
-
-Grafana provides visualization and dashboards for:
-
-* Cluster health
-* Node utilization
-* Pod utilization
-* Deployment status
-* Application metrics
-
----
-
-## Application Metrics
-
-The Flask application exposes Prometheus metrics via:
+Application metrics are exposed via:
 
 ```text
 /metrics
 ```
 
-Custom metrics include:
+Metrics are collected by Prometheus and visualized in Grafana.
 
-### Request Counter
+Example custom metric:
 
 ```text
 app_requests_total
 ```
 
-Tracks the total number of requests received by the application.
+### Autoscaling
 
-Example:
+The application automatically scales based on CPU utilization.
 
-```promql
-app_requests_total
-```
-
----
-
-## ServiceMonitor
-
-A ServiceMonitor automatically registers the application with Prometheus.
-
-Discovery Flow:
+Current configuration:
 
 ```text
-Prometheus
-     ↓
-ServiceMonitor
-     ↓
-Service
-     ↓
-Pods
-     ↓
-/metrics
+Min Pods: 2
+Max Pods: 5
+Target CPU: 50%
 ```
 
-This enables automatic scraping without manual Prometheus configuration.
+## Example Local DNS Configuration
 
----
+Example hosts entries for a homelab environment:
 
-# Troubleshooting Experience
+```text
+<k3s-node-ip> k8s-project.local
+<k3s-node-ip> grafana.k8s-project.local
+<k3s-node-ip> prometheus.k8s-project.local
+```
 
-Several common Kubernetes issues were encountered and resolved.
+Replace `<k3s-node-ip>` with the IP address of your Kubernetes node.
 
-## CrashLoopBackOff
+## Monitoring Stack
 
-Cause:
+Installed using Helm:
 
-* Missing Python dependency
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
 
-Resolution:
+helm install kube-prometheus-stack \
+  prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+```
 
-* Updated requirements.txt
-* Rebuilt container image
-* Redeployed application
+Components include:
 
----
+- Prometheus
+- Grafana
+- Alertmanager
+- kube-state-metrics
+- node-exporter
 
-## CreateContainerConfigError
+## Learning Objectives
 
-Cause:
+This project demonstrates:
 
-* Invalid ConfigMap/Secret references
+- Docker
+- Kubernetes
+- K3s
+- GitHub Actions
+- GitHub Container Registry
+- Prometheus
+- Grafana
+- Traefik
+- Horizontal Pod Autoscaling
+- Service Discovery
+- Ingress Management
+- Containerized Application Delivery
+- Observability and Monitoring
 
-Resolution:
+## Future Roadmap
 
-* Corrected Kubernetes manifests
-* Redeployed workload
+### Platform Operations Dashboard
 
----
+Potential future project focused on:
 
-## Kubernetes API Version Errors
+- Service catalog
+- Deployment tracking
+- Cluster health
+- Platform observability
+- Internal developer portal concepts
 
-Cause:
+### Support Operations Dashboard
 
-* Invalid API versions
+Potential future project focused on:
 
-Examples:
+- Customer health metrics
+- Support KPIs
+- SLA tracking
+- CSAT reporting
+- Operational visibility for support leadership
 
-* apps/v2
-* apps/v3
+## Security Notes
 
-Resolution:
+This repository intentionally excludes:
 
-* Corrected resource definitions
+- API keys
+- Access tokens
+- Private certificates
+- SSH keys
+- kubeconfig files
+- Production credentials
 
----
+All example secrets and configuration values are placeholders only.
 
-## Application Startup Failure
+## Status
 
-Cause:
+Current Status: Operational
 
-* Python syntax error
+Verified Components:
 
-Resolution:
+- GitHub Actions
+- GitHub Container Registry
+- K3s
+- Traefik
+- ConfigMaps
+- Secrets
+- Horizontal Pod Autoscaling
+- Prometheus
+- Grafana
+- ServiceMonitor
+- Application Metrics
 
-* Reviewed pod logs
-* Corrected code
-* Rebuilt image
-* Performed rolling deployment
-
----
-
-## Prometheus Discovery Issues
-
-Cause:
-
-* Missing ServiceMonitor configuration
-
-Resolution:
-
-* Added ServiceMonitor
-* Verified target registration
-* Confirmed metrics ingestion
-
----
-
-# Skills Demonstrated
-
-* Linux Administration
-* Docker
-* Kubernetes
-* Ingress
-* Autoscaling
-* Monitoring
-* Observability
-* Prometheus
-* Grafana
-* Configuration Management
-* Secrets Management
-* Git Workflows
-* Troubleshooting
-* Operational Diagnostics
-
----
-
-# Future Improvements
-
-Planned enhancements:
-
-* GitHub Actions CI/CD pipeline
-* Helm packaging
-* Alertmanager integrations
-* Custom Grafana dashboards
-* Persistent storage
-* Deployment to dedicated Linux homelab
-* Multi-node Kubernetes cluster
-* GitOps workflow implementation
-
----
-
-# Learning Outcome
-
-This project was created to develop practical experience with Kubernetes and cloud-native operations through hands-on implementation rather than isolated tutorials.
-
-The project demonstrates the complete lifecycle of a modern application including deployment, configuration management, autoscaling, ingress routing, monitoring, observability, and troubleshooting.
+This repository serves as the foundational platform for future DevOps and Operations-focused projects.
