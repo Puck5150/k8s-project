@@ -35,12 +35,15 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,format=long
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags:
+          tags: |
             ${{ steps.meta.outputs.tags }}
           labels:
             ${{ steps.meta.outputs.labels }}
