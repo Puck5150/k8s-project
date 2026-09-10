@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: k8s-project-config
 data:
-  APP_ENV: "local-kubernetes"
-  APP_MESSAGE: "Hello from ConfigMap"
+  APP_ENV: "homelab-k3s"
+  APP_MESSAGE: "Hello from the Homelab platform"
   APP_VERSION: "0.2.0"
   GIT_COMMIT: "manual"
