@@ -1,0 +1,83 @@
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: media
+  labels:
+    app: plex
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      # Replace with the node containing your movies
+      nodeSelector:
+        kubernetes.io/hostname: homelab
+
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+
+      containers:
+        - name: plex
+          image: lscr.io/linuxserver/plex:latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: PUID
+              value: "999"
+            - name: PGID
+              value: "988"
+            - name: TZ
+              value: "America/Chicago"
+            - name: VERSION
+              value: "docker"
+
+          ports:
+            - name: plex-web
+              containerPort: 32400
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+
+          volumeMounts:
+            - name: plex-config
+              mountPath: /config
+
+            - name: movies
+              mountPath: /movies
+              readOnly: true
+
+            - name: transcoding
+              mountPath: /transcode
+
+      volumes:
+        - name: plex-config
+          hostPath:
+            path: /srv/plex/config
+            type: Directory
+
+        - name: movies
+          hostPath:
+            path: /srv/storage/Movies
+            type: Directory
+
+        - name: transcoding
+          emptyDir:
+            sizeLimit: 8Gi
+
